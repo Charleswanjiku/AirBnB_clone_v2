@@ -1,16 +1,29 @@
 #!/usr/bin/python3
-from fabric.api import run, local, put
-from datetime import datetime
+"""A module for web application deployment with Fabric."""
 import os
+from datetime import datetime
+from fabric.api import local, runs_once
 
 
+@runs_once
 def do_pack():
-    """ fabric script that generates a .tgz """
-    date = datetime.now().strftime("%Y%m%d%H%M%S")
-    path = "versions/web_static_{}.tgz".format(date)
+    """Archives the static files."""
+    if not os.path.isdir("versions"):
+        os.mkdir("versions")
+    cur_time = datetime.now()
+    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+        cur_time.year,
+        cur_time.month,
+        cur_time.day,
+        cur_time.hour,
+        cur_time.minute,
+        cur_time.second
+    )
     try:
-        local("mkdir -p versions")
-        local("tar -czvf {} web_static".format(path))
-        return path
-    except:
-        return None
+        print("Packing web_static to {}".format(output))
+        local("tar -cvzf {} web_static".format(output))
+        archize_size = os.stat(output).st_size
+        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
+    except Exception:
+        output = None
+    return output
