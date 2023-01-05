@@ -57,18 +57,35 @@ button:hover {
     border-radius: 4px;
     background: #FAFAFA;
     padding-bottom: 25px;
+    height: 300px;
+    overflow-y: auto;
+}
+.popover::-webkit-scrollbar {
+    display: none;
 }
 .amenities .popover {
-    padding: 20px 0;
-    margin-left: -5px;
-    margin-top: 1%;
+    margin: 0.09% 0 0 -5px;
 }
 .locations .popover {
-    margin-top: 1%;
+    margin-top: 0.09%;
 }
 .popover ul {
     list-style-type: none;
 }
+
+.locations .popover ul li h2{
+    margin: 20px 0 0 -20px
+}
+
+.locations .popover ul li ul li{
+    margin: 7px 0 0 -36px;
+}
+
+.amenities .popover ul li{
+    margin: -5px 0 0 15px;
+    padding: 4px 0 9.5px 0;
+}
+
 .amenities:hover .popover,
 .locations:hover .popover {
     visibility: visible;

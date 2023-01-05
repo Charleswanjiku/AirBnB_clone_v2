@@ -25,51 +25,50 @@ class FileStorage:
         Return:
             returns a dictionary of __object
         """
-        if cls is not None:
-            if type(cls) == str:
-                cls = eval(cls)
-            class_dict = {}
+        if cls:
+            dic = {}
             for key, val in self.__objects.items():
                 if type(val) == cls:
-                    class_dict[key] = val
-            return class_dict
-        return self.__objects
+                    dic[key] = self.__objects[key]
+            return dic
+        else:
+            return self.__objects
 
     def new(self, obj):
         """sets __object to given obj
         Args:
             obj: given object
         """
-        self.__objects["{}.{}".format(type(obj).__name__, obj.id)] = obj
+        if obj:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            self.__objects[key] = obj
 
     def save(self):
         """serialize the file path to JSON file path
         """
-        obj_dict = {obj: self.__objects[obj].to_dict()
-                    for obj in self.__objects.keys()}
+        my_dict = {}
+        for key, value in self.__objects.items():
+            my_dict[key] = value.to_dict()
         with open(self.__file_path, 'w', encoding="UTF-8") as f:
-            json.dump(obj_dict, f)
+            json.dump(my_dict, f)
 
     def reload(self):
         """serialize the file path to JSON file path
         """
         try:
             with open(self.__file_path, 'r', encoding="UTF-8") as f:
-                for obj in json.load(f).values():
-                    name = obj["__class__"]
-                    del obj["__class__"]
-                    self.new(eval(name)(**obj))
+                for key, value in (json.load(f)).items():
+                    value = eval(value["__class__"])(**value)
+                    self.__objects[key] = value
         except FileNotFoundError:
             pass
 
     def delete(self, obj=None):
-        """Delete object from self objects if exists
-        """
-        try:
-            del self.__objects["{}.{}".format(type(obj).__name__, obj.id)]
-        except (AttributeError, KeyError):
-            pass
+        """ deletes an object """
+        if obj:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            del self.__objects[key]
 
     def close(self):
-        """reload method."""
+        """ reload method"""
         self.reload()

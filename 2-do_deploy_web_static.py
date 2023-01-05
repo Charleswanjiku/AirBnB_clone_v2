@@ -1,28 +1,33 @@
 #!/usr/bin/python3
-""" Script that distributes an archive to your web servers using do_deploy"""
+from fabric.api import *
+from datetime import datetime
+import os
 
-from fabric.api import local
-from fabric.operations import run, put, sudo
-import os.path
-from fabric.api import env
-env.hosts = ['35.185.103.0', '35.237.21.105']
+env.hosts = ['35.196.60.116', '54.221.176.56']
+env.user = 'ubuntu'
 
 
 def do_deploy(archive_path):
-    if (os.path.isfile(archive_path) is False):
+    """ fabric script to deploy to a server """
+    if not os.path.exists(archive_path):
         return False
 
+    filename = archive_path.split("/")
+    filename = filename[1]
+    fname = filename.split('.')
+    fname = fname[0]
+
+    newpath = '/data/web_static/releases/{}/'.format(fname)
+
     try:
-        nconfig = archive_path.split("/")[-1]
-        ndir = ("/data/web_static/releases/" + nconfig.split(".")[0])
         put(archive_path, "/tmp/")
-        run("sudo mkdir -p {}".format(ndir))
-        run("sudo tar -xzf /tmp/{} -C {}".format(nconfig, ndir))
-        run("sudo rm /tmp/{}".format(nconfig))
-        run("sudo mv {}/web_static/* {}/".format(ndir, ndir))
-        run("sudo rm -rf {}/web_static".format(ndir))
-        run("sudo rm -rf /data/web_static/current")
-        run("sudo ln -s {} /data/web_static/current".format(ndir))
+        run("mkdir -p {}".format(newpath))
+        run("tar -xzf /tmp/{} -C {}".format(filename, newpath))
+        run("rm /tmp/{}".format(filename))
+        run("mv {}web_static/* {}".format(newpath, newpath))
+        run("rm -rf {}web_static".format(newpath))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(newpath))
         return True
     except:
         return False

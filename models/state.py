@@ -1,11 +1,10 @@
 #!/usr/bin/python3
-"""This is the state class."""
-from models.base_model import Base, BaseModel
+"""This is the state class"""
+from models.base_model import BaseModel, Base
 from models.city import City
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
 import models
-import os
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
@@ -13,15 +12,12 @@ class State(BaseModel, Base):
     Attributes:
         name: input name
     """
-    __tablename__ = 'states'
+    __tablename__ = "states"
     name = Column(String(128), nullable=False)
-    cities = relationship('City', backref='state', cascade='delete')
+    cities = relationship("City", cascade="all, delete, delete-orphan",
+                          backref="state")
 
-    if ("HBNB_TYPE_STORAGE", None) is None:
-        @property
-        def cities(self):
-            Clist = []
-            for city in list(models.storage.all(City).values()):
-                if city.state_id == self.id:
-                    city_list.append(city)
-            return Clist
+    @property
+    def cities(self):
+        objs = models.storage.all(City)
+        return [v for k, v in objs.items() if v.state_id == self.id]

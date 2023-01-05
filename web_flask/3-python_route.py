@@ -1,32 +1,34 @@
 #!/usr/bin/python3
-
-from flask import Flask
-
+""" Script that runs a Flask app """
+from flask import Flask, escape
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 
-@app.route('/', strict_slashes=False)
+@app.route('/')
 def hello():
-    return "Hello HBNB!"
+    """ function that returns on url /"""
+    return 'Hello HBNB!'
 
 
-@app.route('/hbnb', strict_slashes=False)
+@app.route('/hbnb')
 def hbnb():
-    return "HBNB"
+    """ function that returns on url /hbnb"""
+    return 'HBNB'
 
 
-@app.route('/c/<text>', strict_slashes=False)
-def cfun(text):
-    txt = text.replace('_', " ")
-    return "C {}". format(txt)
+@app.route('/c/<text>')
+def hello_c(text):
+    """ function that returns a input"""
+    return 'C %s' % escape(text.replace('_', ' '))
 
 
-@app.route('/python', strict_slashes=False)
-@app.route('/python/<text>', strict_slashes=False)
-def python(text='is cool'):
-    txt = text.replace('_', " ")
-    return "Python {}". format(txt)
+@app.route("/python/", defaults={"text": "is cool"})
+@app.route('/python/<text>')
+def hello_python(text):
+    """ function that returns a input and has a default"""
+    return 'Python %s' % escape(text.replace('_', ' '))
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host='0.0.0.0', port=5000)

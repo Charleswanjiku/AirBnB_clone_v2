@@ -1,23 +1,25 @@
 #!/usr/bin/python3
-
-from models import storage
+""" Script that runs a Flask app """
 from flask import Flask, render_template
-
-app = Flask('web_flask')
-
-
-@app.route('/hbnb_filters', strict_slashes=False)
-def display_filters():
-    states = storage.all('State')
-    amenities = storage.all('Amenity')
-    return render_template('10-hbnb_filters.html',
-                           states=states, amenities=amenities)
+from models import storage
+from models.amenity import Amenity
+app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def teardown(exc):
+def closing(error):
+    """closes session """
     storage.close()
 
 
+@app.route('/hbnb_filters', strict_slashes=False)
+def hbnb_filters():
+    """ function that renders airbnb template"""
+    state = storage.all('State')
+    amenities = storage.all('Amenity')
+    return render_template('10-hbnb_filters.html', state=state,
+                           amenities=amenities)
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host='0.0.0.0', port=5000)
